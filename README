@@ -49,6 +49,14 @@ log suppression category was somehow declared twice with the same data
 
 在Project Settings -> Project -> Maps & Modes 设置Game Instance为TsGameInstance
 
+- 更新ue.d.ts
+
+- 在visual studio code通过tsc:watch编译ts代码
+
+<https://github.com/chexiongsheng/puerts_unreal_demo>
+
+编译，在vscode上“Terminal -> Run Build Task”选tsc watch，修改代码后会自动编译
+
 - 运行
 
 使用puerts过滤，参考output log如下
