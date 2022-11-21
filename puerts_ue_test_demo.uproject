@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{C8115B8F-4E1E-585C-4D1F-5D96059594DA}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "puerts_ue_test_demo",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
