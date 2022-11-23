@@ -87,3 +87,19 @@ Puerts: (0x00000813528EAFF0) STOMP: send PING every 10000ms
 Puerts: (0x00000813528EAFF0) STOMP: check PONG every 10000ms
 Puerts: (0x00000813528EAFF0) StompController onConnect Enter
 ```
+
+## UE测试
+
+在Content下创建AutoTest目录
+
+从Content/ThirdPerson/Maps拷贝ThirdPersonMap到Content/AutoTest目录，重命名为TestFunctionalMap
+
+在Project Settings -> Maps & Modes 设置Default Map为TestFunctionalMap
+
+参照如下文档和视频搭建Level
+
+<https://docs.unrealengine.com/5.0/en-US/quick-start-guide-for-blueprints-visual-scripting-in-unreal-engine/>
+
+[Using Blueprint Interfaces to Reduce Coupling in Unreal Engine 4](https://www.youtube.com/watch?v=JkJLeG8cErc&list=PLL4s8QTahRc11XP1Zn21F0v4CVD3abVKI)
+
+[Automated functional testing in UE4](https://www.youtube.com/watch?v=HscEt4As0_g&list=PLL4s8QTahRc11XP1Zn21F0v4CVD3abVKI)
