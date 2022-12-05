@@ -307,7 +307,7 @@ async function QuickStartMain_Part_StompController() {
     });
 
     gStompController.registerEndpoint({
-        appDestination: "/test/run/case_0001_BP_BadSwitch",
+        appDestination: "/test/run/case_0002_BP_BadSwitch",
         callback: async (inMessage) => {
             let world = getWorld();
 
