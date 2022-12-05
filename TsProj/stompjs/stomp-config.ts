@@ -135,6 +135,8 @@ export class StompConfig {
    */
   public logRawCommunication?: boolean;
 
+  public logHeartbeat?: boolean;
+
   /**
    * See [Client#debug]{@link Client#debug}.
    */

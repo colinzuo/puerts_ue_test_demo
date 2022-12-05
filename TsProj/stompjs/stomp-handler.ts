@@ -61,6 +61,8 @@ export class StompHandler {
 
   public logRawCommunication: boolean;
 
+  public logHeartbeat: boolean;
+
   public splitLargeFrames: boolean;
 
   public maxWebSocketChunkSize: number;
@@ -141,12 +143,14 @@ export class StompHandler {
       },
       // On Incoming Ping
       () => {
-        this.debug('<<< PONG');
+        if (this.logHeartbeat) {
+          this.debug('<<< PONG');
+        }
       }
     );
 
     this._webSocket.onmessage = (evt: IStompSocketMessageEvent) => {
-      this.debug('Received data');
+      // this.debug('Received data');
       this._lastServerActivityTS = Date.now();
 
       if (this.logRawCommunication) {
@@ -281,7 +285,10 @@ export class StompHandler {
       this._pinger = setInterval(() => {
         if (this._webSocket.readyState === StompSocketState.OPEN) {
           this._webSocket.send(BYTE.LF);
-          this.debug('>>> PING');
+
+          if (this.logHeartbeat) {
+            this.debug('>>> PING');
+          }
         }
       }, ttl);
     }

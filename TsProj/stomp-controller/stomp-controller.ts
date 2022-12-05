@@ -106,16 +106,25 @@ export class StompController {
         });
     }
 
-    public sendMessage(params: {inMessage?: IMessage, outMessage: IPublishParams}) {
-        const { inMessage, outMessage } = params;
+    public sendMessage(params: {inMessage?: IMessage, outMessage?: IPublishParams}) {
+        let { inMessage, outMessage } = params;
+
+        if (!outMessage) {
+            outMessage = {};
+        }
 
         if (inMessage) {
             outMessage.destination = inMessage.headers.replyDestination;
 
             outMessage.headers = outMessage.headers || {};
+            
+            if (inMessage.headers.replyAppDestination) {
+                outMessage.headers.appDestination = inMessage.headers.replyAppDestination;
+            }
 
-            outMessage.headers.appDestination = inMessage.headers.replyAppDestination;
-            outMessage.headers.streamId = inMessage.headers.streamId;
+            if (inMessage.headers.streamId) {
+                outMessage.headers.streamId = inMessage.headers.streamId;
+            }
         }
 
         this.stompClient.publish(outMessage);

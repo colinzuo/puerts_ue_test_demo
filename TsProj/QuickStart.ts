@@ -6,6 +6,8 @@ import { UEWebsocket } from './websocket';
 import { FrameImpl, Client } from './stompjs';
 import { gStompController, StompController, StompControllerConfig } from './stomp-controller';
 
+let gameInstance = argv.getByName("GameInstance") as UE.GameInstance;
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -14,12 +16,18 @@ function displayIncomingMessage(user, message) {
     console.log(`user ${user}: ${message}`);
 }
 
+function getWorld() {
+    let world = gameInstance.GetWorld();
+    return world;
+}
+
 // debugger;
 console.log("before QuickStartMain");
 
 console.log("WebSocketFunctionLibrary.GetLogVerbosity before set", UE.WebSocketFunctionLibrary.GetLogVerbosity());
 
-UE.WebSocketFunctionLibrary.SetLogVerbosity("Verbose");
+// Error, Warning, Log, Verbose
+UE.WebSocketFunctionLibrary.SetLogVerbosity("Warning");
 
 console.log("WebSocketFunctionLibrary.GetLogVerbosity after set", UE.WebSocketFunctionLibrary.GetLogVerbosity());
 
@@ -158,11 +166,46 @@ async function QuickStartMain_Part_StompController() {
 
     let controllerConfig = new StompControllerConfig();
     controllerConfig.brokerURL = "ws://172.16.23.70:15674/ws";
-    controllerConfig.controllerId = "QuickStart";
+    controllerConfig.controllerId = "colinzuo-desktop-ue";
 
     let stompController = new StompController(controllerConfig);
 
     gStompController.start();
+
+    gStompController.registerEndpoint({
+        appDestination: "/level/getCurrentLevelName",
+        callback: (inMessage) => {
+            let world = getWorld();
+
+            let levelName = UE.GameplayStatics.GetCurrentLevelName(world);
+
+            gStompController.sendMessage({
+                inMessage,
+                outMessage: {
+                    jsonBody: {
+                        levelName,
+                    }
+                }
+            })
+        }
+    });
+
+    gStompController.registerEndpoint({
+        appDestination: "/level/open",
+        callback: (inMessage) => {
+            let json_body = JSON.parse(inMessage.body);
+
+            console.log(`to open level ${json_body.levelName}`);
+
+            let world = getWorld();
+
+            UE.GameplayStatics.OpenLevel(world, json_body.levelName);
+
+            gStompController.sendMessage({
+                inMessage,
+            })
+        }
+    });
 
     console.log("QuickStartMain_Part_StompController leave", new Date().toISOString());
 }

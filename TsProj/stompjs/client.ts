@@ -275,6 +275,8 @@ export class Client {
    */
   public logRawCommunication: boolean;
 
+  public logHeartbeat: boolean;
+
   /**
    * By default, debug messages are discarded. To log to `console` following can be used:
    *
@@ -355,6 +357,7 @@ export class Client {
     this.onWebSocketClose = noOp;
     this.onWebSocketError = noOp;
     this.logRawCommunication = false;
+    this.logHeartbeat = false;
     this.onChangeState = noOp;
 
     // These parameters would typically get proper values before connect is called
@@ -448,6 +451,7 @@ export class Client {
       maxWebSocketChunkSize: this.maxWebSocketChunkSize,
       forceBinaryWSFrames: this.forceBinaryWSFrames,
       logRawCommunication: this.logRawCommunication,
+      logHeartbeat: this.logHeartbeat,
       appendMissingNULLonIncoming: this.appendMissingNULLonIncoming,
       discardWebsocketOnCommFailure: this.discardWebsocketOnCommFailure,
 
