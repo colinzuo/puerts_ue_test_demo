@@ -21,6 +21,35 @@ function getWorld() {
     return world;
 }
 
+function getActorWithTag(world, tagName: string) {
+    let outActors = $ref<UE.TArray<UE.Actor>>();
+    UE.GameplayStatics.GetAllActorsWithTag(world, tagName, outActors)
+    let outActorsValue = $unref(outActors);
+
+    if (outActorsValue.Num()) {
+        return outActorsValue.Get(0);
+    } else {
+        return null;
+    }
+}
+
+async function waitActorReachLocation(actor: UE.Actor, targetLocation: UE.Vector, timeoutMs = 10_000) {
+    let finalTime = Date.now() + timeoutMs;
+
+    while (Date.now() < finalTime) {
+        let curLocation = actor.K2_GetActorLocation();
+        let distance = curLocation.op_Subtraction(targetLocation).Size2D();
+
+        if (distance < 50) {
+            return true;
+        }
+
+        await sleep(1000);
+    }
+
+    return false;
+}
+
 // debugger;
 console.log("before QuickStartMain");
 
@@ -204,6 +233,146 @@ async function QuickStartMain_Part_StompController() {
             gStompController.sendMessage({
                 inMessage,
             })
+        }
+    });
+
+    gStompController.registerEndpoint({
+        appDestination: "/test/run/case_0001_BP_GoodSwitch",
+        callback: async (inMessage) => {
+            let world = getWorld();
+
+            try {
+                let goodSwitchActor = getActorWithTag(world, "GoodSwitch");
+
+                if (!goodSwitchActor) {
+                    throw new Error("not found goodSwitchActor")
+                }
+
+                let ceilingLightActor = getActorWithTag(world, "CeilingLight") as UE.Game.AutoTest.BP_CustomCeilingLight.BP_CustomCeilingLight_C;
+
+                if (!ceilingLightActor) {
+                    throw new Error("not found ceilingLightActor")
+                }
+
+                let isLightVisible = ceilingLightActor.PointLight1.IsVisible();
+
+                console.log("isLightVisible", isLightVisible);
+
+                let playerController = UE.GameplayStatics.GetPlayerController(world, 0);
+                let targetLocation = goodSwitchActor.K2_GetActorLocation();
+
+                console.log("player location", playerController.Pawn.K2_GetActorLocation().ToString());
+                console.log("target location", targetLocation.ToString());
+
+                let startDistance = playerController.Pawn.K2_GetActorLocation().op_Subtraction(targetLocation).Size2D();
+
+                console.log(`startDistance ${startDistance}`);
+
+                // UE.AIBlueprintHelperLibrary.SimpleMoveToLocation(playerController, targetLocation);
+                UE.AIBlueprintHelperLibrary.SimpleMoveToActor(playerController, goodSwitchActor);
+
+                let reached = await waitActorReachLocation(playerController.Pawn, targetLocation, 10_000);
+
+                console.log("player location", playerController.Pawn.K2_GetActorLocation().ToString());
+                console.log("target location", targetLocation.ToString());
+
+                if (!reached) {
+                    throw new Error("timeout, not reach goodSwitchActor")
+                }
+
+                isLightVisible = ceilingLightActor.PointLight1.IsVisible();
+
+                console.log("isLightVisible", isLightVisible);
+
+                if (!isLightVisible) {
+                    throw new Error("light is not turned on");
+                }
+    
+                gStompController.sendMessage({
+                    inMessage,
+                })
+            } catch (error) {
+                gStompController.sendMessage({
+                    inMessage,
+                    outMessage: {
+                        jsonBody: {
+                            error: {
+                                message: error.toString(),
+                            },
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    gStompController.registerEndpoint({
+        appDestination: "/test/run/case_0001_BP_BadSwitch",
+        callback: async (inMessage) => {
+            let world = getWorld();
+
+            try {
+                let badSwitchActor = getActorWithTag(world, "BadSwitch");
+
+                if (!badSwitchActor) {
+                    throw new Error("not found badSwitchActor")
+                }
+
+                let ceilingLightActor = getActorWithTag(world, "CeilingLight") as UE.Game.AutoTest.BP_CustomCeilingLight.BP_CustomCeilingLight_C;
+
+                if (!ceilingLightActor) {
+                    throw new Error("not found ceilingLightActor")
+                }
+
+                let isLightVisible = ceilingLightActor.PointLight1.IsVisible();
+
+                console.log("isLightVisible", isLightVisible);
+
+                let playerController = UE.GameplayStatics.GetPlayerController(world, 0);
+                let targetLocation = badSwitchActor.K2_GetActorLocation();
+
+                console.log("player location", playerController.Pawn.K2_GetActorLocation().ToString());
+                console.log("target location", targetLocation.ToString());
+
+                let startDistance = playerController.Pawn.K2_GetActorLocation().op_Subtraction(targetLocation).Size2D();
+
+                console.log(`startDistance ${startDistance}`);
+
+                // UE.AIBlueprintHelperLibrary.SimpleMoveToLocation(playerController, targetLocation);
+                UE.AIBlueprintHelperLibrary.SimpleMoveToActor(playerController, badSwitchActor);
+
+                let reached = await waitActorReachLocation(playerController.Pawn, targetLocation, 10_000);
+
+                console.log("player location", playerController.Pawn.K2_GetActorLocation().ToString());
+                console.log("target location", targetLocation.ToString());
+
+                if (!reached) {
+                    throw new Error("timeout, not reach badSwitchActor")
+                }
+
+                isLightVisible = ceilingLightActor.PointLight1.IsVisible();
+
+                console.log("isLightVisible", isLightVisible);
+
+                if (!isLightVisible) {
+                    throw new Error("light is not turned on");
+                }
+    
+                gStompController.sendMessage({
+                    inMessage,
+                })
+            } catch (error) {
+                gStompController.sendMessage({
+                    inMessage,
+                    outMessage: {
+                        jsonBody: {
+                            error: {
+                                message: error.toString(),
+                            },
+                        }
+                    }
+                })
+            }
         }
     });
 
