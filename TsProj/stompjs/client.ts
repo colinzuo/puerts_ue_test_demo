@@ -76,7 +76,7 @@ export class Client {
    */
   public connectionTimeout: number = 0;
 
-  private _connectionWatcher: number; // Timer
+  private _connectionWatcher: any; // Timer
 
   /**
    *  automatically reconnect with delay in milliseconds, set to 0 to disable.
